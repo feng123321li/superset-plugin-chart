@@ -16,8 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNonEmpty } from '@superset-ui/core';
-import { ControlPanelConfig, sections, sharedControls } from '@superset-ui/chart-controls';
+import {
+  ensureIsArray,
+  smartDateFormatter,
+  t,
+  validateNonEmpty
+} from '@superset-ui/core';
+
+import {
+  ControlPanelConfig,
+  ControlSubSectionHeader,
+  D3_TIME_FORMAT_OPTIONS,
+  sections,
+  sharedControls,
+  Dataset,
+  getStandardizedControls,
+} from '@superset-ui/chart-controls';
 
 const config: ControlPanelConfig = {
   /**
@@ -103,11 +117,21 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         [
           {
-            name: 'cols',
+            name: 'groupbyColumns',
             config: {
               ...sharedControls.groupby,
               label: t('Columns'),
-              description: t('Columns to group by'),
+              description: t('Columns to group by on the columns'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'groupbyRows',
+            config: {
+              ...sharedControls.groupby,
+              label: t('Rows'),
+              description: t('Columns to group by on the rows'),
             },
           },
         ],
@@ -132,59 +156,113 @@ const config: ControlPanelConfig = {
       ],
     },
     {
-      label: t('Hello Controls!'),
+      label: t('Options'),
+      expanded: true,
+      tabOverride: 'data',
+      controlSetRows: [
+        [
+          {
+            name: 'rowTotals',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show rows total'),
+              default: false,
+              renderTrigger: true,
+              description: t('Display row level total'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'colTotals',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show columns total'),
+              default: false,
+              renderTrigger: true,
+              description: t('Display column level total'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'transposePivot',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Transpose pivot'),
+              default: false,
+              description: t('Swap rows and columns'),
+              renderTrigger: true,
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: t('Options'),
       expanded: true,
       controlSetRows: [
         [
           {
-            name: 'header_text',
-            config: {
-              type: 'TextControl',
-              default: 'Hello, World!',
-              renderTrigger: true,
-              // ^ this makes it apply instantaneously, without triggering a "run query" button
-              label: t('Header Text'),
-              description: t('The text you want to see in the header'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'bold_text',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Bold Text'),
-              renderTrigger: true,
-              default: true,
-              description: t('A checkbox to make the '),
-            },
-          },
-        ],
-        [
-          {
-            name: 'header_font_size',
+            name: 'date_format',
             config: {
               type: 'SelectControl',
-              label: t('Font Size'),
-              default: 'xl',
-              choices: [
-                // [value, label]
-                ['xxs', 'xx-small'],
-                ['xs', 'x-small'],
-                ['s', 'small'],
-                ['m', 'medium'],
-                ['l', 'large'],
-                ['xl', 'x-large'],
-                ['xxl', 'xx-large'],
-              ],
+              freeForm: true,
+              label: t('Date format'),
+              default: smartDateFormatter.id,
               renderTrigger: true,
-              description: t('The size of your header font'),
+              choices: D3_TIME_FORMAT_OPTIONS,
+              description: t('D3 time format for datetime columns'),
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: '配置总计',
+      expanded: true,
+      controlSetRows: [
+        [
+          {
+            name: 'row_totals_rename',
+            config: {
+              type: 'TextControl',
+              default: '总计',
+              renderTrigger: true,
+              label: '行总计别名设置：',
+              description: '行总计别名',
+            },
+          },
+        ],
+        [
+          {
+            name: 'col_totals_rename',
+            config: {
+              type: 'TextControl',
+              default: '总计',
+              renderTrigger: true,
+              label: '列总计别名设置：',
+              description: '列总计别名',
             },
           },
         ],
       ],
     },
   ],
+  formDataOverrides: formData => {
+    const groupbyColumns = getStandardizedControls().controls.columns.filter(
+        col => !ensureIsArray(formData.groupbyRows).includes(col),
+    );
+    getStandardizedControls().controls.columns =
+        getStandardizedControls().controls.columns.filter(
+            col => !groupbyColumns.includes(col),
+        );
+    return {
+      ...formData,
+      metrics: getStandardizedControls().popAllMetrics(),
+      groupbyColumns,
+    };
+  },
 };
 
 export default config;

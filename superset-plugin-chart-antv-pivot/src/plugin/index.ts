@@ -35,7 +35,7 @@ export default class SupersetPluginChartAntvPivot extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'Superset Plugin Chart Antv Pivot',
+      description: 'Antv 透视图',
       name: t('Antv Pivot'),
       thumbnail,
     });

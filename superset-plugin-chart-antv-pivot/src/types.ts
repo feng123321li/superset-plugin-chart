@@ -16,7 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { QueryFormData, supersetTheme, TimeseriesDataRecord } from '@superset-ui/core';
+import {
+    QueryFormData,
+    supersetTheme,
+    TimeseriesDataRecord,
+    DataRecordValue,
+    TimeFormatter,
+    NumberFormatter,
+    QueryFormColumn,
+} from '@superset-ui/core';
 
 export interface SupersetPluginChartAntvPivotStylesProps {
   height: number;
@@ -24,6 +32,11 @@ export interface SupersetPluginChartAntvPivotStylesProps {
   headerFontSize: keyof typeof supersetTheme.typography.sizes;
   boldText: boolean;
 }
+
+export type DateFormatter =
+    | TimeFormatter
+    | NumberFormatter
+    | ((value: DataRecordValue) => string);
 
 interface SupersetPluginChartAntvPivotCustomizeProps {
   headerText: string;
@@ -37,4 +50,15 @@ export type SupersetPluginChartAntvPivotProps = SupersetPluginChartAntvPivotStyl
   SupersetPluginChartAntvPivotCustomizeProps & {
     data: TimeseriesDataRecord[];
     // add typing here for the props you pass in from transformProps.ts!
+    fields: object;
+    meta: object;
+    groupbyRows: QueryFormColumn[];
+    groupbyColumns: QueryFormColumn[];
+    rowTotals: boolean,
+    rowSubTotals: boolean,
+    colTotals: boolean,
+    colSubTotals: boolean,
+    totalData: [],
+    rowTotalsRename: string,
+    colTotalsRename: string
   };
