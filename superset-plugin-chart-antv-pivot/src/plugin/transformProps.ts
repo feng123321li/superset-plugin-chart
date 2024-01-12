@@ -80,6 +80,7 @@ export default function transformProps(chartProps: ChartProps) {
         colSubTotals,
         rowTotalsRename,
         colTotalsRename,
+        transposePivot,
     } = formData;
 
     const {colnames, coltypes} = queriesData[0];
@@ -110,9 +111,14 @@ export default function transformProps(chartProps: ChartProps) {
         )
         : [metrics];
 
+
+    //转置透视图,默认false
+    const rows = transposePivot ? groupbyColumns : groupbyRows;
+    const columns = transposePivot ? groupbyRows : groupbyColumns;
+
     const fields = {
-        "rows": groupbyRows,
-        "columns": groupbyColumns,
+        "rows": rows,
+        "columns": columns,
         "values": formattedMetrics,
         "valueInCols": true
     };
@@ -242,7 +248,7 @@ export default function transformProps(chartProps: ChartProps) {
     // Combine row and column totals into totalData array
     const totalData = [...rowTotalsData, ...colTotalsData, sumOfRowTotals];
 
-    console.log('totalData is', totalData);
+    // console.log('totalData is', totalData);
 
 
     return {

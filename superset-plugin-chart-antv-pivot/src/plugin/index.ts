@@ -21,6 +21,7 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
+import example from '../images/example.png';
 
 export default class SupersetPluginChartAntvPivot extends ChartPlugin {
   /**
@@ -38,6 +39,9 @@ export default class SupersetPluginChartAntvPivot extends ChartPlugin {
       description: 'Antv 透视图',
       name: t('Antv Pivot'),
       thumbnail,
+      exampleGallery: [
+        { url: example, caption: '透视图' },
+      ]
     });
 
     super({
